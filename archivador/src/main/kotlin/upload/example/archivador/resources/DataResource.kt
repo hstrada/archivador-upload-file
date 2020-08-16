@@ -12,7 +12,7 @@ import upload.example.archivador.entities.Teacher
 class DataResource() {
 
 	@GetMapping("/entities")
-	fun uploadFile(): ResponseEntity<*> {
+	fun retrieveEntities(): ResponseEntity<*> {
 
 		var entities = DataHelper.findClasses("upload.example.archivador.entities")
 
