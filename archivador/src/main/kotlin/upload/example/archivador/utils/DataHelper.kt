@@ -6,7 +6,7 @@ import java.io.File
 
 class DataHelper {
 	companion object Factory {
-		fun findClasses(pckgname: String): ArrayList<String> {
+		fun retrieveEntities(pckgname: String): ArrayList<String> {
 
 						// Translate the package name into an absolute path
 			var name = pckgname

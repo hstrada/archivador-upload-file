@@ -14,6 +14,7 @@ import upload.example.archivador.services.UploadService
 import upload.example.archivador.entities.Student
 import org.apache.commons.csv.CSVRecord
 import net.minidev.json.JSONObject
+import upload.example.archivador.entities.Teacher
 
 
 @RestController
@@ -21,22 +22,26 @@ class UploadResource(private val uploadService: UploadService) {
 
 	@PostMapping("/upload")
 	fun uploadFile(
-		@RequestParam("file") file: MultipartFile, @RequestParam(
+		@RequestParam("file") file: MultipartFile,
+		@RequestParam(
 			name = "hasHeader",
 			defaultValue = "true"
-		) hasHeader: Boolean
+		) hasHeader: Boolean,
+		@RequestParam("entity") entity: String
 	): ResponseEntity<*> {
 
 		try {
-			var students: ArrayList<Student> = ArrayList<Student>()
+			var items: ArrayList<Class<*>> = ArrayList<Class<*>>()
 			var csvRecords = uploadService.convertToRecords(file, hasHeader)
 			for (record: CSVRecord in csvRecords) {
-				var student = Student(
-					record.get(0).toLong(), record.get(1), record.get(2)
-				)
-				students.add(student)
+				var item = Class.forName("upload.example.archivador.entities.Student")?.newInstance()
+				var item2 = Class.forName("upload.example.archivador.entities.Student")?.kotlin
+				var item3 = Class.forName("upload.example.archivador.entities.Student").newInstance()::class.java.getDeclaredMethods().forEach {
+					it.setAccessible(true)
+				}
+
 			}
-			return ResponseEntity.status(HttpStatus.OK).body(students)
+			return ResponseEntity.status(HttpStatus.OK).body(items)
 		} catch (e: Exception) {
 			var errorResponse = JSONObject()
 			errorResponse.put("message", e.message)

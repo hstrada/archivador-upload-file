@@ -12,9 +12,9 @@ import upload.example.archivador.entities.Teacher
 class DataResource() {
 
 	@GetMapping("/entities")
-	fun retrieveEntities(): ResponseEntity<*> {
+	fun loadEntities(): ResponseEntity<*> {
 
-		var entities = DataHelper.findClasses("upload.example.archivador.entities")
+		var entities = DataHelper.retrieveEntities("upload.example.archivador.entities")
 
 		var result: HashMap<String, ArrayList<String>> = HashMap<String, ArrayList<String>>()
 
