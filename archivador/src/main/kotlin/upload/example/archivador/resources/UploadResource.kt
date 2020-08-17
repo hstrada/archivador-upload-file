@@ -21,20 +21,57 @@ import kotlin.reflect.KMutableProperty
 @RestController
 class UploadResource(private val uploadService: UploadService) {
 
-	fun setValue(ownerClassName: String, fieldName: String, value: Any) {
+	fun createObjectFromRecord(
+		ownerClassName: String,
+		fieldName: String,
+		value: Any,
+		fieldNameWithValues: HashMap<String, String> = HashMap<String, String>()
+	): Any {
 		val kClass = Class.forName(ownerClassName).kotlin
 
 		val instance = kClass.objectInstance ?: kClass.java.newInstance()
-		val member = kClass.members
-			.filterIsInstance<KMutableProperty<*>>()
-			.filter { it.name == fieldName }
-			.firstOrNull()
-		member?.setter?.call(instance, value)
-		println(member)
-		println(kClass)
-		instance::class.members.forEach {
-			println(instance.javaClass.getMethod("get${it.name.capitalize()}").invoke(instance))
+
+		for (keyValue in fieldNameWithValues) {
+			val member = kClass.members
+				.filterIsInstance<KMutableProperty<*>>()
+				.filter { it.name == keyValue.key }
+				.firstOrNull()
+
+			// member?.setter?.call(instance, keyValue.value)
+
+			var memberType: Any = member?.returnType.toString().split(".")[1]
+			if (memberType == "String") {
+				member?.setter?.call(instance, keyValue.value)
+			} else {
+				// member?.setter?.call(instance, keyValue.value.toLong())
+				var memberValue = keyValue.value
+
+				var result: Any = when (memberType) {
+					"Int" -> memberValue.toInt()
+					"Long" -> memberValue.toLong()
+					"Double" -> memberValue.toDouble()
+					"Float" -> memberValue.toFloat()
+					else -> println("Unknown Type")
+				}
+
+				member?.setter?.call(instance, result)
+			}
+
 		}
+
+
+//		val member = kClass.members
+//			.filterIsInstance<KMutableProperty<*>>()
+//			.filter { it.name == fieldName }
+//			.firstOrNull()
+//		member?.setter?.call(instance, value)
+
+
+//		instance::class.members.forEach {
+//			instance.javaClass.getMethod("get${it.name.capitalize()}").invoke(instance)
+//		}
+
+		return instance
 	}
 
 	@PostMapping("/upload")
@@ -48,22 +85,19 @@ class UploadResource(private val uploadService: UploadService) {
 	): ResponseEntity<*> {
 
 		try {
-			var items: ArrayList<Class<*>> = ArrayList<Class<*>>()
+			var items: ArrayList<Any> = ArrayList<Any>()
 			var csvRecords = uploadService.convertToRecords(file, hasHeader)
 
-			println(setValue("upload.example.archivador.entities.Student", "link", "Helena"))
+			for (record: CSVRecord in csvRecords) {
+				var recordMap: HashMap<String, String> = HashMap<String, String>()
+				recordMap.put("id", record.get(0))
+				recordMap.put("name", record.get(1))
+				recordMap.put("link", record.get(2))
+				var item =
+					createObjectFromRecord("upload.example.archivador.entities.${entity}", "link", "Helena", recordMap)
+				items.add(item)
+			}
 
-
-//			for (record: CSVRecord in csvRecords) {
-//				var item = Class.forName("upload.example.archivador.entities.Student")?.newInstance()
-//				var item2 = Class.forName("upload.example.archivador.entities.Student")?.kotlin
-//				var item3 =
-//					Class.forName("upload.example.archivador.entities.Student").newInstance()::class.java.getDeclaredMethods()
-//						.forEach {
-//							it.setAccessible(true)
-//						}
-//
-//			}
 			return ResponseEntity.status(HttpStatus.OK).body(items)
 		} catch (e: Exception) {
 			var errorResponse = JSONObject()
