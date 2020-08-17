@@ -74,8 +74,8 @@ class UploadResource(private val uploadService: UploadService) {
 			for (record: CSVRecord in csvRecords) {
 				var recordMap: HashMap<String, String> = HashMap<String, String>()
 				recordMap.put("id", record.get(0))
-				recordMap.put("name", record.get(1))
-				recordMap.put("link", record.get(2))
+				recordMap.put("firstName", record.get(1))
+				recordMap.put("lastName", record.get(2))
 				var item =
 					createObjectFromRecord("upload.example.archivador.entities.${entity}", recordMap)
 				items.add(item)
