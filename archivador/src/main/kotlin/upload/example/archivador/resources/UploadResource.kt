@@ -23,8 +23,6 @@ class UploadResource(private val uploadService: UploadService) {
 
 	fun createObjectFromRecord(
 		ownerClassName: String,
-		fieldName: String,
-		value: Any,
 		fieldNameWithValues: HashMap<String, String> = HashMap<String, String>()
 	): Any {
 		val kClass = Class.forName(ownerClassName).kotlin
@@ -37,13 +35,10 @@ class UploadResource(private val uploadService: UploadService) {
 				.filter { it.name == keyValue.key }
 				.firstOrNull()
 
-			// member?.setter?.call(instance, keyValue.value)
-
 			var memberType: Any = member?.returnType.toString().split(".")[1]
 			if (memberType == "String") {
 				member?.setter?.call(instance, keyValue.value)
 			} else {
-				// member?.setter?.call(instance, keyValue.value.toLong())
 				var memberValue = keyValue.value
 
 				var result: Any = when (memberType) {
@@ -58,18 +53,6 @@ class UploadResource(private val uploadService: UploadService) {
 			}
 
 		}
-
-
-//		val member = kClass.members
-//			.filterIsInstance<KMutableProperty<*>>()
-//			.filter { it.name == fieldName }
-//			.firstOrNull()
-//		member?.setter?.call(instance, value)
-
-
-//		instance::class.members.forEach {
-//			instance.javaClass.getMethod("get${it.name.capitalize()}").invoke(instance)
-//		}
 
 		return instance
 	}
@@ -94,7 +77,7 @@ class UploadResource(private val uploadService: UploadService) {
 				recordMap.put("name", record.get(1))
 				recordMap.put("link", record.get(2))
 				var item =
-					createObjectFromRecord("upload.example.archivador.entities.${entity}", "link", "Helena", recordMap)
+					createObjectFromRecord("upload.example.archivador.entities.${entity}", recordMap)
 				items.add(item)
 			}
 
