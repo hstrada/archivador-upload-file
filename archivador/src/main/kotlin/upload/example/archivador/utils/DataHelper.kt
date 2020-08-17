@@ -15,14 +15,12 @@ class DataHelper {
 			}
 			name = name.replace('.', '/')
 
-			// Get a File object for the package
 			val url: URL = Launcher::class.java.getResource(name)
 			val directory = File(url.getFile())
 
 			var entities: ArrayList<String> = ArrayList<String>()
 			
 			if (directory.exists()) {
-				// Get the list of the files contained in the package
 				directory.walk()
 					.filter { f -> f.isFile() && f.name.contains('$') == false && f.name.endsWith(".class") }
 					.forEach {
@@ -36,12 +34,8 @@ class DataHelper {
 							System.err.println(cnfex)
 							throw cnfex
 						} catch (iex: InstantiationException) {
-							// We try to instantiate an interface
-							// or an object that does not have a
-							// default constructor
 							throw iex
 						} catch (iaex: IllegalAccessException) {
-							// The class is not public
 							throw iaex
 						}
 					}
