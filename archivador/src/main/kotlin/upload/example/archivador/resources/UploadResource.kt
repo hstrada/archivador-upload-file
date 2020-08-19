@@ -21,42 +21,6 @@ import kotlin.reflect.KMutableProperty
 @RestController
 class UploadResource(private val uploadService: UploadService) {
 
-	fun createObjectFromRecord(
-		ownerClassName: String,
-		fieldNameWithValues: HashMap<String, String> = HashMap<String, String>()
-	): Any {
-		val kClass = Class.forName(ownerClassName).kotlin
-
-		val instance = kClass.objectInstance ?: kClass.java.newInstance()
-
-		for (keyValue in fieldNameWithValues) {
-			val member = kClass.members
-				.filterIsInstance<KMutableProperty<*>>()
-				.filter { it.name == keyValue.key }
-				.firstOrNull()
-
-			var memberType: Any = member?.returnType.toString().split(".")[1]
-			if (memberType == "String") {
-				member?.setter?.call(instance, keyValue.value)
-			} else {
-				var memberValue = keyValue.value
-
-				var result: Any = when (memberType) {
-					"Int" -> memberValue.toInt()
-					"Long" -> memberValue.toLong()
-					"Double" -> memberValue.toDouble()
-					"Float" -> memberValue.toFloat()
-					else -> println("Unknown Type")
-				}
-
-				member?.setter?.call(instance, result)
-			}
-
-		}
-
-		return instance
-	}
-
 	@PostMapping("/upload")
 	fun uploadFile(
 		@RequestParam("file") file: MultipartFile,
@@ -64,7 +28,8 @@ class UploadResource(private val uploadService: UploadService) {
 			name = "hasHeader",
 			defaultValue = "true"
 		) hasHeader: Boolean,
-		@RequestParam("entity") entity: String
+		@RequestParam("entity") entity: String,
+		@RequestParam("fields") fields: ArrayList<String>
 	): ResponseEntity<*> {
 
 		try {
@@ -73,11 +38,12 @@ class UploadResource(private val uploadService: UploadService) {
 
 			for (record: CSVRecord in csvRecords) {
 				var recordMap: HashMap<String, String> = HashMap<String, String>()
-				recordMap.put("id", record.get(0))
-				recordMap.put("firstName", record.get(1))
-				recordMap.put("lastName", record.get(2))
+				println(fields)
+				for ((index, value) in fields.withIndex()) {
+					recordMap.put(value, record.get(index))
+				}
 				var item =
-					createObjectFromRecord("upload.example.archivador.entities.${entity}", recordMap)
+					CSVHelper.createObjectFromRecord("upload.example.archivador.entities.${entity}", recordMap)
 				items.add(item)
 			}
 

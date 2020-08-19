@@ -8,6 +8,7 @@ import org.apache.commons.csv.CSVFormat
 import upload.example.archivador.entities.Student
 import org.apache.commons.csv.CSVRecord
 import org.springframework.web.multipart.MultipartFile
+import kotlin.reflect.KMutableProperty
 
 class CSVHelper {
 
@@ -49,6 +50,42 @@ class CSVHelper {
 				throw e
 			}
 
+		}
+
+		fun createObjectFromRecord(
+			ownerClassName: String,
+			fieldNameWithValues: HashMap<String, String> = HashMap<String, String>()
+		): Any {
+			val kClass = Class.forName(ownerClassName).kotlin
+
+			val instance = kClass.objectInstance ?: kClass.java.newInstance()
+
+			for (keyValue in fieldNameWithValues) {
+				val member = kClass.members
+					.filterIsInstance<KMutableProperty<*>>()
+					.filter { it.name == keyValue.key }
+					.firstOrNull()
+
+				var memberType: Any = member?.returnType.toString().split(".")[1]
+				if (memberType == "String") {
+					member?.setter?.call(instance, keyValue.value)
+				} else {
+					var memberValue = keyValue.value
+
+					var result: Any = when (memberType) {
+						"Int" -> memberValue.toInt()
+						"Long" -> memberValue.toLong()
+						"Double" -> memberValue.toDouble()
+						"Float" -> memberValue.toFloat()
+						else -> println("Unknown Type")
+					}
+
+					member?.setter?.call(instance, result)
+				}
+
+			}
+
+			return instance
 		}
 
 	}
