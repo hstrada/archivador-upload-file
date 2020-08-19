@@ -37,9 +37,14 @@ And of course, if the first line has a header or not. If it has, you don't need 
 ### Input
 
 For example:
-file - test.csv
-entity - City
-fields - id, name
+
+form-data
+
+| Key           | Value         | Type          |
+| ------------- | ------------- | ------------- |
+| file          | test.csv      | file          |
+| entity        | City          | text          |
+| fields        | id, name      | text          |
 
 ### Output
 
