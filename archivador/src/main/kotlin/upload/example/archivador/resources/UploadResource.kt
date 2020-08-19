@@ -38,7 +38,6 @@ class UploadResource(private val uploadService: UploadService) {
 
 			for (record: CSVRecord in csvRecords) {
 				var recordMap: HashMap<String, String> = HashMap<String, String>()
-				println(fields)
 				for ((index, value) in fields.withIndex()) {
 					recordMap.put(value, record.get(index))
 				}

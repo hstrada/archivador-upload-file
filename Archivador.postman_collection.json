@@ -1,0 +1,84 @@
+{
+	"info": {
+		"_postman_id": "178ff4c4-ca88-4bdb-9aa3-56ee87755aff",
+		"name": "Archivador",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "File.Upload",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/teste-csv.csv",
+							"disabled": true
+						},
+						{
+							"key": "hasHeader",
+							"value": "true",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/teste-csv-without-header.csv",
+							"disabled": true
+						},
+						{
+							"key": "entity",
+							"value": "Student",
+							"type": "text"
+						},
+						{
+							"key": "fields",
+							"value": "name, link",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/_git/archivador-upload-file/example_files/teste-csv-without-id.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/upload",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Load.Entities",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/entities",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"entities"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
